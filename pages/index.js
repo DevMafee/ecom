@@ -1,8 +1,10 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import getCommerce from '../utils/commerce'
 
-export default function Home() {
+export default function Home(props) {
+  const { products } = props;
+  console.log('products', products);
   return (
     <div className={styles.container}>
       <Head>
@@ -12,9 +14,15 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to E-Com
-        </h1>
+        {
+          products && products.map((product)=>(
+            <div key={product.id}>
+              <img src={product.media.source} alt={product.name} />
+              <p>{product.name}</p>
+              <p>{product.price.formatted_with_symbol}</p>
+            </div>
+          ))
+        }
       </main>
 
       <footer className={styles.footer}>
@@ -31,4 +39,15 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+export async function getStaticProps(){
+  const commerce = getCommerce()
+  const { data:products } = await commerce.products.list();
+
+  return {
+    props:{
+      products,
+    }
+  };
 }
